@@ -4,7 +4,7 @@
 
 
 
-# 🎯 What is Transparency?
+#  What is Transparency?
 
 Transparency analyzes messages on Gmail, WhatsApp Web... in real-time.
 It combines **VirusTotal link reputation** with **Gemini AI semantic analysis** to generate a **0-100% risk score** with a plain-English explanation.
@@ -26,7 +26,7 @@ Chrome Extension → displays popup
 
 ---
 
-# ⚙️ Installation & Setup
+#  Installation & Setup
 
 ### Prerequisites
 - Python 3.11+
