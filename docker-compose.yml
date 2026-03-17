@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  # Our FastAPI backend service
+  backend:
+    # Build the image from our Dockerfile
+    build: .
+    
+    # Map port 8000 of the container to port 8000 of the host
+    ports:
+      - "8000:8000"
+    
+    # Restart automatically if the container crashes
+    restart: unless-stopped
+    
+    # Mount the database file so data persists
+    volumes:
+      - ./transparency.db:/app/transparency.db
