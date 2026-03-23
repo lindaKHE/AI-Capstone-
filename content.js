@@ -20,40 +20,51 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "trigger_analysis") {
         if (!lastRightClickedElement) return;
 
-        // Extract data based on the platform
-        const currentUrl = window.location.hostname;
-        let payload = { 
-            platform: "unknown", 
-            extracted_text: "", 
-            context: {
-                hidden_url: hoveredLink // Passes the hidden URL to the backend if one exists
-            } 
-        };
-
-        if (currentUrl.includes("leboncoin.fr")) {
-            payload = parseLeboncoin(lastRightClickedElement, payload);
-        } else if (currentUrl.includes("whatsapp.com")) {
-            payload = parseWhatsApp(lastRightClickedElement, payload);
-        } else if (currentUrl.includes("mail.google.com")) {
-            payload = parseGmail(lastRightClickedElement, payload);
-        }
-
-        // Show the loading UI at the mouse coordinates
-        renderFloatingUI(mouseX, mouseY, { state: "loading" });
-
-        // Simulate the backend API call (replace with fetch later)
-        setTimeout(() => {
-            const mockResult = generateMockResponse(payload.platform);
+        // --- GDPR CONSENT GATE ---
+        chrome.storage.local.get(['consentGiven', 'clientId'], (storage) => {
             
-            // Update the UI with the final score
-            renderFloatingUI(mouseX, mouseY, { state: "complete", data: mockResult });
-
-            // --- THE HIGH-RISK PIPELINE ---
-            if (mockResult.risk_score > 85) {
-                flagToBackendDatabase(payload, mockResult);
+            // 1. If no consent, block execution and show warning UI
+            if (!storage.consentGiven) {
+                renderFloatingUI(mouseX, mouseY, { state: "no_consent" });
+                return; 
             }
 
-        }, 1500);
+            // 2. Extract data based on the platform
+            const currentUrl = window.location.hostname;
+            let payload = { 
+                client_id: storage.clientId, // --- ATTACH ANONYMOUS UUID ---
+                platform: "unknown", 
+                extracted_text: "", 
+                context: {
+                    hidden_url: hoveredLink 
+                } 
+            };
+
+            if (currentUrl.includes("leboncoin.fr")) {
+                payload = parseLeboncoin(lastRightClickedElement, payload);
+            } else if (currentUrl.includes("whatsapp.com")) {
+                payload = parseWhatsApp(lastRightClickedElement, payload);
+            } else if (currentUrl.includes("mail.google.com")) {
+                payload = parseGmail(lastRightClickedElement, payload);
+            }
+
+            // Show the loading UI at the mouse coordinates
+            renderFloatingUI(mouseX, mouseY, { state: "loading" });
+
+            // Simulate the backend API call (replace with fetch later)
+            setTimeout(() => {
+                const mockResult = generateMockResponse(payload.platform);
+                
+                // Update the UI with the final score
+                renderFloatingUI(mouseX, mouseY, { state: "complete", data: mockResult });
+
+                // --- THE HIGH-RISK PIPELINE ---
+                if (mockResult.risk_score > 85) {
+                    flagToBackendDatabase(payload, mockResult);
+                }
+
+            }, 1500);
+        }); // Close storage callback
     }
 });
 
@@ -119,6 +130,13 @@ function renderFloatingUI(x, y, info) {
             <div style="font-weight: bold; margin-bottom: 5px; color: #2563eb;">Transparency is scanning...</div>
             <div style="font-size: 12px; color: #64748b;">Extracting context and querying AI.</div>
         `;
+    } else if (info.state === "no_consent") {
+        overlay.innerHTML = `
+            <div style="font-weight: bold; margin-bottom: 5px; color: #991b1b;">Action Required</div>
+            <div style="font-size: 13px; line-height: 1.4; color: #475569;">
+                Please click the Transparency extension icon in your toolbar and accept the Privacy Policy to enable scanning.
+            </div>
+        `;
     } else if (info.state === "complete") {
         const score = info.data.risk_score;
         let color = score < 40 ? "#166534" : (score < 75 ? "#854d0e" : "#991b1b");
@@ -176,7 +194,7 @@ function parseLeboncoin(targetNode, payload) {
         const descNode = document.querySelector('#readme-content') || document.querySelector('[data-qa-id="adview_description_container"] p');
         if (descNode) payload.context.ad_description = descNode.innerText.trim();
 
-// 4. Extract Seller Context
+        // 4. Extract Seller Context
         const profileContainer = document.querySelector('[data-qa-id="adview_profile_part"]');
         if (profileContainer) {
             // Name: Target the specific profile link
@@ -206,6 +224,7 @@ function parseLeboncoin(targetNode, payload) {
     console.log("Leboncoin Extraction payload ready:", payload);
     return payload;
 }
+
 function parseWhatsApp(targetNode, payload) {
     payload.platform = "whatsapp";
     
@@ -261,6 +280,7 @@ function parseWhatsApp(targetNode, payload) {
     console.log("WhatsApp Extraction payload ready:", payload);
     return payload;
 }
+
 function parseGmail(targetNode, payload) {
     payload.platform = "gmail";
     
