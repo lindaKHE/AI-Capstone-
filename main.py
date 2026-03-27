@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from ai.orchestrator import orchestrate
+
 import sqlite3
 import datetime
 
@@ -103,11 +105,9 @@ def analyze(payload: Payload):
             "source": "cache"  # Pour savoir que c'est du cache
         }
     
-    # Pas dans le cache → réponse mock pour l'instant
-    result = {
-        "risk_score": 50,
-        "reason": "Analyse IA en cours de développement"
-    }
+    # réponse mock pour l'instant
+    result = orchestrate(payload.dict())
+ 
     
     # Sauvegarder dans le cache
     cursor.execute("""
