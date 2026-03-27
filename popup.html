@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+    <title>Transparency</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Transparency</h2>
+
+        <div id="consent-view" style="display: none;">
+            <div class="card warning">
+                <h3 style="margin:0; font-size:16px;">Privacy First</h3>
+                <p style="font-size:12px;">To protect you from scams, we securely analyze the context of suspicious messages.</p>
+            </div>
+            <div class="reason-box">
+                <p>We use an Anonymous ID. We do not track your identity or IP address.</p>
+                <a href="#" style="font-size: 11px; color: #2563eb;">Read our Privacy Policy</a>
+            </div>
+            <button id="agree-btn">I Agree & Continue</button>
+        </div>
+
+        <div id="active-view" style="display: none;">
+            <div class="card safe">
+                <h3 style="margin:0; font-size:16px;">Protection Active</h3>
+                <p style="font-size:12px;">Right-click any suspicious message on Leboncoin, WhatsApp, or Gmail to scan it.</p>
+            </div>
+            <div class="reason-box">
+                <p style="font-size: 11px; margin-bottom: 5px;">Your Anonymous Client ID:</p>
+                <code id="client-id-display" style="font-size: 10px; word-break: break-all; color: #64748b;"></code>
+            </div>
+            <button id="revoke-btn" style="background-color: #991b1b; margin-top: 10px;">Revoke Consent</button>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

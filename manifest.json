@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Transparency Client",
+  "version": "1.0",
+  "description": "Extracts threat intel data from Leboncoin, WhatsApp, and Gmail.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.leboncoin.fr/*",
+    "*://web.whatsapp.com/*",
+    "*://mail.google.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.leboncoin.fr/*",
+        "*://web.whatsapp.com/*",
+        "*://mail.google.com/*"
+      ],
+      "js": ["content.js"]
+    }
+  ]
+}
