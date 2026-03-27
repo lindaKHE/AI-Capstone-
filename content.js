@@ -52,18 +52,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             renderFloatingUI(mouseX, mouseY, { state: "loading" });
 
             // Simulate the backend API call (replace with fetch later)
-            setTimeout(() => {
-                const mockResult = generateMockResponse(payload.platform);
-                
-                // Update the UI with the final score
-                renderFloatingUI(mouseX, mouseY, { state: "complete", data: mockResult });
-
-                // --- THE HIGH-RISK PIPELINE ---
-                if (mockResult.risk_score > 85) {
-                    flagToBackendDatabase(payload, mockResult);
-                }
-
-            }, 1500);
+            fetch('http://localhost:8000/analyze', {
+              method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+})
+.then(res => res.json())
+.then(result => {
+    renderFloatingUI(mouseX, mouseY, { state: "complete", data: result });
+    if (result.risk_score > 85) {
+        flagToBackendDatabase(payload, result);
+    }
+})
+.catch(err => {
+    console.error("Transparency: Backend error", err);
+    const mockResult = generateMockResponse(payload.platform);
+    renderFloatingUI(mouseX, mouseY, { state: "complete", data: mockResult });
+});
         }); // Close storage callback
     }
 });
@@ -80,14 +85,14 @@ function flagToBackendDatabase(extractedData, aiResult) {
 
     console.log("Payload ready for IT Engineer's /report endpoint:", JSON.stringify(threatPayload, null, 2));
 
-    /* // THE FUTURE FETCH REQUEST (Uncomment when backend is ready):
+     // THE FUTURE FETCH REQUEST (Uncomment when backend is ready):
     fetch('http://localhost:8000/report_threat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(threatPayload)
     }).then(res => console.log("Threat logged successfully"))
       .catch(err => console.error("Failed to log threat", err));
-    */
+    
 }
 
 // --- 4. Floating UI Injection ---
