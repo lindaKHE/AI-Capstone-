@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transparency — AI Threat Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🛡️</div>
+            <div>
+                <h1>Transparency</h1>
+                <span>AI-Powered Threat Detection Dashboard</span>
+            </div>
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            Backend Online
+        </div>
+    </header>
+
+    <main>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Scans</div>
+                <div class="stat-value" id="total-scans">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">High Risk Detected</div>
+                <div class="stat-value danger" id="high-risk">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Safe Messages</div>
+                <div class="stat-value safe" id="safe-count">—</div>
+            </div>
+        </div>
+
+        <!-- ANALYZER -->
+        <div class="analyzer">
+            <h2>🔍 Analyze a Message</h2>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Platform</label>
+                    <select id="platform">
+                        <option value="gmail">Gmail</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="leboncoin">Leboncoin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sender Email (optional)</label>
+                    <input type="text" id="sender-email" 
+                    placeholder="ex: support@fake-paypal.ru">
+                </div>
+                <div class="form-group full">
+                    <label>Suspicious Message</label>
+                    <textarea id="message" 
+                    placeholder="Paste the suspicious message here..."></textarea>
+                </div>
+                <div class="form-group full">
+                    <label>Suspicious URL (optional)</label>
+                    <input type="text" id="hidden-url" 
+                    placeholder="ex: http://fake-amazon.ru/login">
+                </div>
+            </div>
+
+            <button class="analyze-btn" id="analyze-btn" onclick="analyzeMessage()">
+                🔍 Analyze Message
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Analyzing with VirusTotal + Groq AI...</div>
+            </div>
+
+            <div class="result" id="result">
+                <div class="result-header">
+                    <div class="result-title" id="result-verdict">—</div>
+                    <div class="score-badge" id="result-score">—</div>
+                </div>
+                <div class="result-reason" id="result-reason">—</div>
+                <div class="tactics" id="result-tactics"></div>
+            </div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="history">
+            <h2>📋 Recent Scans</h2>
+            <div class="history-list" id="history-list">
+                <div class="empty-history">
+                    No scans yet — analyze a message to get started
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
